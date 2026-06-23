@@ -876,10 +876,40 @@ option[disabled].reservado {background: #eee; color: #888; }
     gap:4px;
     min-width:0; /*==evita estourar a linha*/
 }
-
 .svc-name{
     font-weight:600;
     font-size:1.02rem;
     color:#0f172a;
     word-break:break-word;  /*==Nomes grandes quebram bonitinho */
+}
+.svc-muted{
+    font-size:.95rem;
+    color:#6b7280;
+}
+
+/* ===Rádio sempre na mesma coluna e centralizado verticalmente*/
+.svc-radio{
+    justify-self:center; /* ==Centraliza na coluna dos 40px*/
+    width:20px;
+    height:20px;
+    margin:0;               /* ==Removemos margens que deslocavam o Círculo*/
+    accent-color:#111827; /* === Cor do check*/
+    cursor:pointer;
+}
+
+.svc-actions{
+    display:flex;
+    gap:10px;
+    justify-content:flex-end;
+    padding:12px;
+    border-top:1px solid #eee;
+    background:#fff;
+}
+.svc-btn{  padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer; border:0; }
+.svc-btn-ghost{ background:#f2f4f7; color:#111827; }
+.svc-btn-dark{ background:#111827; color:fff;}
+
+@media (max-width:420px){
+    .svc-name{font-size:1rem;}
+    .svc-muted{ font-size:.9rem;}
 }
