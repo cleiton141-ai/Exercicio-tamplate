@@ -96,3 +96,73 @@ const SERVICOS = [
     { nome: 'Corte + Luzes + Progressiva', valor: 165,00 },
     { nome: 'Corte + Pigmentação + Barba', valor: 100,00 },
 ];
+
+const toBRL = (n) => (Number(n) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+//=====Helpers de modal =====
+function abrirModal(id) {document.getElementById(id).style.display = 'flex'; }
+function fecharModal(id) {document.getElementById(id).style.display = 'none'; }
+window.fecharModal = fecharModal;
+
+//===== Persistencia (RA Club)====
+function salvarContextoSessao() {
+    try {
+        sessionStorage.setItem('agendamentoCtx', JSON.stringify(agendamentoContexto));
+        sessionStorage.setItem('ctx', JSON.stringify(ctx));
+    } catch { }
+}
+function restaurarContextoSessao() {
+    try {
+        const c1 = sessionStorage.getItem('agendamentoCtx');
+        const c2 = sessionStorage.getItem('ctx');
+        if (c1) agendamentoContexto = JSON.parse(c1);
+        if (c2) ctx = JSON.parse(c2);
+    } catch { }
+}
+function tentarRetomarPosCheckout() {
+    const flag = sessionStorage.getItem('raclubCheckoutRedirect');
+    if (flag === '1') {
+        sessionStorage.removeItem('raclubCheckoutRedirect');
+        restaurarContextoSessao();
+        if (ctx.colecao && ctx?.profissional){
+            agendamentoContexto.raclub = { status: 'assinar_Link'};
+            fecharModal('modalRAClub');
+            abrirModalAgendamento();
+        }
+    }
+}
+document.addEventListener('visibilitychange', () ==> {
+    if (document.visibilityState === 'visible') tentarRetomarPosCheckout();
+});
+
+// ==== Fluxo Nome → Produtos → RA Club → Agendamento=====
+const nomeClienteInput = document.getElementById('nomeCliente');
+document.getElementById('btnClienteContinuar')?.addEventListener('click', () => {
+    const nome = (nomeClienteInput.value || '').trim();
+    if (! nome) { alert('Digite seu nome para continuar.'); return;}
+    agendamentoContexto.nomeCliente = nome;
+    fecharModal('modalCliente');
+    abrirModalProdutos();
+});
+
+// Produtos
+const produtosContainer = document.getElementById('produtosContainer');
+const prodTotalSpan = document.getElementById('prodTotal');
+const btnProdutosPular = document.getElementById('btnProdutosPular');
+const btnProdutosContinuar = document.getElementById('btnProdutosContinuar');
+
+function renderProdutos() {
+    produtosContainer.innerHTML = '';
+    PRODUTOS.forEach((p, i) => {
+        const card = document.createElement('div');
+        card.className = 'prod-card';
+        card.dataset.index = i;
+        card.innerHTML = `
+        <div class="p-name">${p.nome}</div>
+        <div class="p-price">${toBRL(p.preco)}</div>
+        <small class="muted">Toque para Selecionar</small>
+        `;
+        card.addEventListener('click', () => toggleProduto(i, card));
+        produtosContainer.appendChild(card);
+    });
+}
