@@ -166,3 +166,70 @@ function renderProdutos() {
         produtosContainer.appendChild(card);
     });
 }
+function toggleProduto(index, cardEL) {
+    const item = PRODUTOS[index];
+    const exists = agendamentoContexto.produtos.find(pr => pr.nome === item.nome);
+    if (exists) {
+        agendamentoContexto.produtos = agendamentoContexto.produtos.filter(pr => pr.nome !== item.nome);
+        cardEL.classList.remove('active');
+    } else {
+        agendamentoContexto.produtos.push({ nome: item.nome, preco:item.preco});
+        cardEL.classList.add('active');
+    }
+    agendamentoContexto.totalProdutos = agendamentoContexto.produtos.reduce((s, it) => s + (it.preco || 0), 0);
+    prodTotalSpan.textContent = toBRL(agendamentoContexto.totalProdutos);
+}
+function abrirModalProdutos() {
+    agendamentoContexto.produtos = [];
+    agendamentoContexto.totalProdutos = 0;
+    prodTotalSpan.textContent = toBRL(0);
+    renderProdutos();
+    abrirModal('modalProdutos');
+}
+btnProdutosPular?.addEventListener('click', () => {fecharModal('modalProdutos'); abrirModalRAClub(); });
+btnProdutosContinuar?.addEventListener('click', () => {fecharModal('modalProdutos'); abrirModalRAClub(); });
+
+ //===RA Club====
+  const btnRAJaMembro = document.getElementById('btnRAJaMembro');
+  const btnRANao = document.getElementById('btnRANao');
+  const btnRAAssinar = document.getElementById('btnRAAssinar');
+  function abrirModalRAClub() {abrirModal('modalRAClub'); }
+  btnRAJaMembro?.addEventListener('click', () => {agendamentoContexto.raclub = {status: 'membro' }; fecharModal('modalRAClub'); abrirModalAgendamento(); });
+  btnRANao?.addEventListener('click', () => { agendamentoContexto.raclub = { status: 'nao'}; fecharModal('modalRAClub'); abrirModalAgendame(); });
+  if (btnRAAssinar) {
+    const RA_CLUB_CHECKOUT_URL = btnRAAssinar.getAttribute('href') || '' ;
+    btnRAAssinar.addEventListener('click', () => {
+        agendamentoContexto.raclub = { status: 'assinar_link' };
+        salvarContextoSessao();
+        sessionStorage.setItem('raclubCheckoutRedirect', '1');
+        if (!RA_CLUB_CHECKOUT_URL) alert('Link de checkout não configurado.');
+    });
+  }
+
+   // ==Agendamento (Data/Hora)
+   const dataInput = document.getElementById('data');
+   const horaSelect = document.getElementById('hora');
+
+    // >>> Horários fixos 09:00-10:00 de 1 em 1 hora
+    const MAPA_FIM_EXPEDIENTE = {
+        'Rodrigo': '18:30',
+        'Melqui': '17:30',
+    };
+      //=== AJUSTE: passo de 60 min e janela 09:00-18:00
+      function gerarIntervalos(inicio = '09:00', fim = '10:00', passoMin = 60) {
+        const out = [];
+        let [h, m] = inicio.split(':').map(Number);
+        const [hF, mF] = fim.split(':'),map(Number);
+        while (h < hF || (h === hF && m <= mF)) {
+            out.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+            m += passoMin;
+            while (m >= 60) { m -= 60; h += 1; }
+        }
+        return out;
+      }
+      function fillHorasForProf(/*prof*/) {
+        const lista = gerarIntervalos('09:00', '10:00', 60); //==09 -> 18 de 1h em 1h
+        horaSelect.innerHTML = `<option value="">Selecione um horário</option>` + 
+            lista.map(h => `<option>${h}</option>`).join('');
+      }
+
