@@ -1,7 +1,7 @@
 //==== Navegação Mobile & smooth===//
 const menuToggle = document.querySelector('.menu-toggle');
 const navLinks = document.querySelector('.nav-links');
-menuToggle?.addEventListener('click',() => {
+menuToggle?.addEventListener('click', () => {
     navLinks.classList.toggle('active');
     const icon = menuToggle.querySelector('i');
     navLinks.classList.contains('active')
@@ -9,18 +9,18 @@ menuToggle?.addEventListener('click',() => {
         : icon.classList.replace('bx-x', 'bx-menu');
 });
 document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    e.preventDefault();
-    const id = a.getAttribute('href');
-    const t = document.querySelector(id);
-    if (!t) return;
-    window.scrollTo({top: t.getBoundingClientRect().top + window.pageYOffset - 80, behavior: 'smooth' });
-    navLinks?.classList.remove('active');
-  });  
+    a.addEventListener('click', e => {
+        e.preventDefault();
+        const id = a.getAttribute('href');
+        const t = document.querySelector(id);
+        if (!t) return;
+        window.scrollTo({ top: t.getBoundingClientRect().top + window.pageYOffset - 80, behavior: 'smooth' });
+        navLinks?.classList.remove('active');
+    });
 });
 
 //===Estado====
-let ctx = { profissional: null,wa: null, colecao:'agendamentos' }; // <==Força agendamentos
+let ctx = { profissional: null, wa: null, colecao: 'agendamentos' }; // <==Força agendamentos
 let agendamentoContexto = {
     nomeCliente: '',
     produtos: [],
@@ -33,17 +33,17 @@ let agendamentoContexto = {
 const REVIEW_URL = document.getElementById('btnAvaliarGoogle')?.getAttribute('href') || '';
 
 const PRODUTOS = [
-    { nome:"Pomada Líquida DA Force MEN", preco:39,99 },
-    { nome:"Leave-in", preco:39,99},
-    { nome:"Tônico Capilar Dom Pelo", preco: 49,99},
-    { nome:"Balm Para Barba", preço: 39,99},
-    { nome:"Pomada Modeladora - Efeito Teia", preço:3 4,99}, 
-    { nome:"Pomada modeladora - Efeito seco", preço: 34,99},       
+    { nome: "Pomada Líquida DA Force MEN", preco: 39, 99 },
+    { nome: "Leave-in", preco: 39, 99},
+    { nome: "Tônico Capilar Dom Pelo", preco: 49, 99},
+    { nome: "Balm Para Barba", preço: 39, 99},
+    { nome: "Pomada Modeladora - Efeito Teia", preço: 3 4, 99},
+    { nome: "Pomada modeladora - Efeito seco", preço: 34, 99},
 ];
 
 // >>> Catálogo de Serviços Mostrado no modal
 const SERVICOS = [
-    { nome: 'Selecionar...', valor:null, placeholder:true }, //Primeira linha
+    { nome: 'Selecionar...', valor: null, placeholder: true }, //Primeira linha
     { nome: 'Acabamento', valor: 20,00 },
     { nome: 'Maquina e Tesoura', valor: 40,00 },
     { nome: 'Corte Maquina', valor: 40,00 },
@@ -100,8 +100,8 @@ const SERVICOS = [
 const toBRL = (n) => (Number(n) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
 //=====Helpers de modal =====
-function abrirModal(id) {document.getElementById(id).style.display = 'flex'; }
-function fecharModal(id) {document.getElementById(id).style.display = 'none'; }
+function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
+function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
 window.fecharModal = fecharModal;
 
 //===== Persistencia (RA Club)====
@@ -124,22 +124,22 @@ function tentarRetomarPosCheckout() {
     if (flag === '1') {
         sessionStorage.removeItem('raclubCheckoutRedirect');
         restaurarContextoSessao();
-        if (ctx.colecao && ctx?.profissional){
-            agendamentoContexto.raclub = { status: 'assinar_Link'};
+        if (ctx.colecao && ctx?.profissional) {
+            agendamentoContexto.raclub = { status: 'assinar_Link' };
             fecharModal('modalRAClub');
             abrirModalAgendamento();
         }
     }
 }
 document.addEventListener('visibilitychange', () ==> {
-    if (document.visibilityState === 'visible') tentarRetomarPosCheckout();
+    if(document.visibilityState === 'visible') tentarRetomarPosCheckout();
 });
 
 // ==== Fluxo Nome → Produtos → RA Club → Agendamento=====
 const nomeClienteInput = document.getElementById('nomeCliente');
 document.getElementById('btnClienteContinuar')?.addEventListener('click', () => {
     const nome = (nomeClienteInput.value || '').trim();
-    if (! nome) { alert('Digite seu nome para continuar.'); return;}
+    if (!nome) { alert('Digite seu nome para continuar.'); return; }
     agendamentoContexto.nomeCliente = nome;
     fecharModal('modalCliente');
     abrirModalProdutos();
@@ -173,7 +173,7 @@ function toggleProduto(index, cardEL) {
         agendamentoContexto.produtos = agendamentoContexto.produtos.filter(pr => pr.nome !== item.nome);
         cardEL.classList.remove('active');
     } else {
-        agendamentoContexto.produtos.push({ nome: item.nome, preco:item.preco});
+        agendamentoContexto.produtos.push({ nome: item.nome, preco: item.preco });
         cardEL.classList.add('active');
     }
     agendamentoContexto.totalProdutos = agendamentoContexto.produtos.reduce((s, it) => s + (it.preco || 0), 0);
@@ -186,50 +186,112 @@ function abrirModalProdutos() {
     renderProdutos();
     abrirModal('modalProdutos');
 }
-btnProdutosPular?.addEventListener('click', () => {fecharModal('modalProdutos'); abrirModalRAClub(); });
-btnProdutosContinuar?.addEventListener('click', () => {fecharModal('modalProdutos'); abrirModalRAClub(); });
+btnProdutosPular?.addEventListener('click', () => { fecharModal('modalProdutos'); abrirModalRAClub(); });
+btnProdutosContinuar?.addEventListener('click', () => { fecharModal('modalProdutos'); abrirModalRAClub(); });
 
- //===RA Club====
-  const btnRAJaMembro = document.getElementById('btnRAJaMembro');
-  const btnRANao = document.getElementById('btnRANao');
-  const btnRAAssinar = document.getElementById('btnRAAssinar');
-  function abrirModalRAClub() {abrirModal('modalRAClub'); }
-  btnRAJaMembro?.addEventListener('click', () => {agendamentoContexto.raclub = {status: 'membro' }; fecharModal('modalRAClub'); abrirModalAgendamento(); });
-  btnRANao?.addEventListener('click', () => { agendamentoContexto.raclub = { status: 'nao'}; fecharModal('modalRAClub'); abrirModalAgendame(); });
-  if (btnRAAssinar) {
-    const RA_CLUB_CHECKOUT_URL = btnRAAssinar.getAttribute('href') || '' ;
+//===RA Club====
+const btnRAJaMembro = document.getElementById('btnRAJaMembro');
+const btnRANao = document.getElementById('btnRANao');
+const btnRAAssinar = document.getElementById('btnRAAssinar');
+function abrirModalRAClub() { abrirModal('modalRAClub'); }
+btnRAJaMembro?.addEventListener('click', () => { agendamentoContexto.raclub = { status: 'membro' }; fecharModal('modalRAClub'); abrirModalAgendamento(); });
+btnRANao?.addEventListener('click', () => { agendamentoContexto.raclub = { status: 'nao' }; fecharModal('modalRAClub'); abrirModalAgendame(); });
+if (btnRAAssinar) {
+    const RA_CLUB_CHECKOUT_URL = btnRAAssinar.getAttribute('href') || '';
     btnRAAssinar.addEventListener('click', () => {
         agendamentoContexto.raclub = { status: 'assinar_link' };
         salvarContextoSessao();
         sessionStorage.setItem('raclubCheckoutRedirect', '1');
         if (!RA_CLUB_CHECKOUT_URL) alert('Link de checkout não configurado.');
     });
-  }
+}
 
-   // ==Agendamento (Data/Hora)
-   const dataInput = document.getElementById('data');
-   const horaSelect = document.getElementById('hora');
+// ==Agendamento (Data/Hora)
+const dataInput = document.getElementById('data');
+const horaSelect = document.getElementById('hora');
 
-    // >>> Horários fixos 09:00-10:00 de 1 em 1 hora
-    const MAPA_FIM_EXPEDIENTE = {
-        'Rodrigo': '18:30',
-        'Melqui': '17:30',
-    };
-      //=== AJUSTE: passo de 60 min e janela 09:00-18:00
-      function gerarIntervalos(inicio = '09:00', fim = '10:00', passoMin = 60) {
-        const out = [];
-        let [h, m] = inicio.split(':').map(Number);
-        const [hF, mF] = fim.split(':'),map(Number);
-        while (h < hF || (h === hF && m <= mF)) {
-            out.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
-            m += passoMin;
-            while (m >= 60) { m -= 60; h += 1; }
-        }
-        return out;
-      }
-      function fillHorasForProf(/*prof*/) {
-        const lista = gerarIntervalos('09:00', '10:00', 60); //==09 -> 18 de 1h em 1h
-        horaSelect.innerHTML = `<option value="">Selecione um horário</option>` + 
-            lista.map(h => `<option>${h}</option>`).join('');
-      }
+// >>> Horários fixos 09:00-10:00 de 1 em 1 hora
+const MAPA_FIM_EXPEDIENTE = {
+    'Rodrigo': '18:30',
+    'Melqui': '17:30',
+};
+//=== AJUSTE: passo de 60 min e janela 09:00-18:00
+function gerarIntervalos(inicio = '09:00', fim = '10:00', passoMin = 60) {
+    const out = [];
+    let [h, m] = inicio.split(':').map(Number);
+    const [hF, mF] = fim.split(':'), map(Number);
+    while (h < hF || (h === hF && m <= mF)) {
+        out.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+        m += passoMin;
+        while (m >= 60) { m -= 60; h += 1; }
+    }
+    return out;
+}
+function fillHorasForProf(/*prof*/) {
+    const lista = gerarIntervalos('09:00', '10:00', 60); //==09 -> 18 de 1h em 1h
+    horaSelect.innerHTML = `<option value="">Selecione um horário</option>` +
+        lista.map(h => `<option>${h}</option>`).join('');
+}
 
+function resetSelectVisual() {
+    for (const opt of horaSelect.options) {
+        if (!opt.value) continue;
+        opt.disable = false;
+        opt.classList.remove('reservado');
+    }
+}
+function abrirModalAgendame() {
+    const hoje = new Date();
+    const y = hoje.getFullYear();
+    const m = String(hoje.getMonth() + 1).padStart(2, "0");
+    const d = String(hoje.getDate()).padStart(2, "0");
+    dataInput.min = `${y}-${m}-${d}`;
+    dataInput.value = "";
+
+    // Horários fixos 
+    fillHorasForProf(ctx.profissional);
+
+    horaSelect.value = "";
+    resetSelectVisual();
+
+    // Exibe serviço atual no "display"===
+    const display = document.getElementById("servicoDisplay");
+    display.value = agendamentoContexto.servico
+        ? `${agendamentoContexto.servico.nome} _ ${toBRL(agendamentoContexto.servico.value)}`
+        : '';
+
+        abrirModal('modal');
+}
+
+  // Botões dos profissionais
+  document.querySelectorAll('.openModalBtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        ctx.profissional = btn.dataset.pro || 'profissional'; // Guardamos o nome exibido
+        ctx.wa = btn.dataset.wa || '5562991165891'; 
+        // Sem usar coleções separadas; o painel le "agendamentos"
+        ctx.colecao = 'agendamento';
+        salvarContextoSessao();
+        abrirModal('modalCliente');
+    });
+  });
+
+  // ===== Firebase====
+  import { initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore,
+    doc,getDoc, setDoc,serveTimestamp,
+    collection,query,where,getDocs
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import {
+    getAuth, singnInAnonymously, onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"
+
+  const firebaseConfig = {
+    apikey: "AIzaSyDgaoVZK-STF5xDFulLISridu9IXbmEYgg",
+    authDomain: "barbearia-agenda-fe2a7.firebaseapp.com",
+    projectId: "barbearia-agenda-fe2a7",
+    storageBucket: "barbearia-agenda-fe2a7.firebasestorage.app",
+    messagingSenderId: "876658896099",
+    appId: "1:876658896099:web:6a361416ed84fd636f29d6",
+    measurementId: "G-NJ4ETW1TNZ"
+  };
