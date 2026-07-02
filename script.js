@@ -295,3 +295,21 @@ function abrirModalAgendame() {
     appId: "1:876658896099:web:6a361416ed84fd636f29d6",
     measurementId: "G-NJ4ETW1TNZ"
   };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // 🔐 login anônimo para cumprir as regras (request.auth != null)
+  const auth = getAuth(app);
+  singnInAnonymously(auth).catch((e) => {
+    console.error("Anon auth error:", e);
+  });
+  onAuthStateChanged(auth, (user) => {
+    console.log("Auth user:", user ? user.uid : null);
+  });
+
+  const confirmarBtn = document.getElementById('confirmarBtn');
+  const toKey = (ymd, hhmm, profSlug) => `ag_${ymd}_${hhmm}_${profSlug}`;
+  const normalizeHora = (h) => (h || "").padStart(5, "0");
+  
+  //======chave agregada para evitar ìndice composto =====
+  const diaProfkey = (ymd, prof) => `${ymd}#${prof}`;
